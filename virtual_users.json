@@ -1,0 +1,8 @@
+{
+  "virtual_users": [
+    {"username": "皮套1", "display_name": "虚拟形象1"},
+    {"username": "vtuber2", "display_name": "虚拟形象2"},
+    {"user_id": 123456789, "display_name": "虚拟形象3"}
+  ],
+  "keywords": ["皮套", "vtuber", "虚拟"]
+} 
