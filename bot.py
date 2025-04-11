@@ -785,7 +785,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def clear_db(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """清除数据库中的所有反馈记录"""
     # 检查用户是否是管理员
-    if str(update.effective_user.id) not in config.get('admin_ids', []):
+    if update.effective_user.id not in config.get('admin_ids', []):
         await update.message.reply_text("抱歉，只有管理员可以执行此操作。")
         return
     
