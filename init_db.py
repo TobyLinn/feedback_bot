@@ -1,17 +1,25 @@
-import os
 import sqlite3
-from config import DB_FILE
+import json
+import os
+
+# Load configuration
+with open('config.json', 'r', encoding='utf-8') as f:
+    config = json.load(f)
 
 def init_db():
-    """初始化数据库"""
-    # 如果数据库文件存在，先删除
-    if os.path.exists(DB_FILE):
-        os.remove(DB_FILE)
+    """Initialize the database with required tables"""
+    # Get database file path from config
+    db_file = config['db_file']
     
-    conn = sqlite3.connect(DB_FILE)
+    # If db_file is just a filename, use current directory
+    if not os.path.dirname(db_file):
+        db_file = os.path.join(os.getcwd(), db_file)
+    
+    # Connect to database
+    conn = sqlite3.connect(db_file)
     c = conn.cursor()
     
-    # 创建反馈表
+    # Create feedback table
     c.execute('''CREATE TABLE IF NOT EXISTS feedback
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
@@ -22,7 +30,7 @@ def init_db():
                   created_at TIMESTAMP,
                   message_id INTEGER)''')
     
-    # 创建订阅表
+    # Create subscriptions table
     c.execute('''CREATE TABLE IF NOT EXISTS subscriptions
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   user_id INTEGER,
@@ -31,9 +39,11 @@ def init_db():
                   created_at TIMESTAMP,
                   status TEXT DEFAULT 'pending')''')
     
+    # Commit changes and close connection
     conn.commit()
     conn.close()
-    print("数据库初始化完成！")
+    
+    print(f"Database initialized successfully at {db_file}")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     init_db() 
