@@ -38,4 +38,5 @@ ENV/
 *.log
 
 # Config files with sensitive information
-config.json 
+config.json
+feedback.db 

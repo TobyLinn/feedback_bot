@@ -1,0 +1,10 @@
+{
+    "bot_token": "your_bot_token_here",
+    "admin_ids": ["your_admin_id_here"],
+    "db_file": "feedback.db",
+    "moviepoilt_api_url": "http://your_moviepoilt_api_url",
+    "moviepoilt_username": "your_moviepoilt_username",
+    "moviepoilt_password": "your_moviepoilt_password",
+    "log_file": "bot.log",
+    "enable_movie_request": true
+} 
