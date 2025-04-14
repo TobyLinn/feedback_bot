@@ -1,49 +1,68 @@
 import sqlite3
-import json
+import logging
 import os
+from datetime import datetime
 
-# Load configuration
-with open('config.json', 'r', encoding='utf-8') as f:
-    config = json.load(f)
+# 配置日志
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
+
+# 数据库文件
+DB_FILE = 'feedback.db'
 
 def init_db():
-    """Initialize the database with required tables"""
-    # Get database file path from config
-    db_file = config['db_file']
-    
-    # If db_file is just a filename, use current directory
-    if not os.path.dirname(db_file):
-        db_file = os.path.join(os.getcwd(), db_file)
-    
-    # Connect to database
-    conn = sqlite3.connect(db_file)
-    c = conn.cursor()
-    
-    # Create feedback table
-    c.execute('''CREATE TABLE IF NOT EXISTS feedback
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  user_id INTEGER,
-                  username TEXT,
-                  content TEXT,
-                  feedback_type TEXT,
-                  status TEXT,
-                  created_at TIMESTAMP,
-                  message_id INTEGER)''')
-    
-    # Create subscriptions table
-    c.execute('''CREATE TABLE IF NOT EXISTS subscriptions
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  user_id INTEGER,
-                  tmdb_url TEXT,
-                  title TEXT,
-                  created_at TIMESTAMP,
-                  status TEXT DEFAULT 'pending')''')
-    
-    # Commit changes and close connection
-    conn.commit()
-    conn.close()
-    
-    print(f"Database initialized successfully at {db_file}")
+    """初始化数据库"""
+    try:
+        # 如果数据库文件已存在，先删除
+        if os.path.exists(DB_FILE):
+            os.remove(DB_FILE)
+            logger.info(f"已删除旧的数据库文件: {DB_FILE}")
 
-if __name__ == "__main__":
+        # 创建新的数据库连接
+        conn = sqlite3.connect(DB_FILE)
+        c = conn.cursor()
+
+        # 创建反馈表
+        c.execute('''CREATE TABLE feedback
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      user_id INTEGER,
+                      username TEXT,
+                      content TEXT,
+                      message_id INTEGER,
+                      feedback_type TEXT,
+                      group_id INTEGER,
+                      priority TEXT,
+                      status TEXT DEFAULT 'pending',
+                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+
+        # 创建群组表
+        c.execute('''CREATE TABLE groups
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                      group_id INTEGER UNIQUE,
+                      group_name TEXT,
+                      is_admin_group INTEGER DEFAULT 0,
+                      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+
+        # 创建触发器，自动更新 updated_at
+        c.execute('''CREATE TRIGGER update_feedback_timestamp
+                     AFTER UPDATE ON feedback
+                     BEGIN
+                         UPDATE feedback SET updated_at = CURRENT_TIMESTAMP
+                         WHERE id = NEW.id;
+                     END;''')
+
+        conn.commit()
+        conn.close()
+        logger.info(f"数据库初始化成功: {DB_FILE}")
+        return True
+
+    except Exception as e:
+        logger.error(f"数据库初始化失败: {str(e)}")
+        return False
+
+if __name__ == '__main__':
     init_db() 

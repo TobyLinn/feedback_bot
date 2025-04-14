@@ -1,43 +1,58 @@
 import json
 import os
 
-# 配置文件路径
-CONFIG_FILE = 'config.json'
+# 获取配置文件路径
+config_path = os.path.join(os.path.dirname(__file__), 'config.json')
 
-# 加载配置
-def load_config():
-    if not os.path.exists(CONFIG_FILE):
-        raise FileNotFoundError(f"配置文件 {CONFIG_FILE} 不存在！")
-    
-    with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
-        config = json.load(f)
-    
-    return config
+# 加载配置文件
+with open(config_path, 'r', encoding='utf-8') as f:
+    config = json.load(f)
 
-# 加载配置
-config = load_config()
+# 数据库文件路径
+DB_FILE = config.get('db_file', 'feedback.db')
 
-# Bot Token
-BOT_TOKEN = config['bot_token']
+# 日志配置
+LOG_FILE = config.get('log_file', 'bot.log')
+LOG_LEVEL = config.get('log_level', 'INFO')
 
-# 反馈接收群组ID列表
+# 机器人配置
+BOT_TOKEN = config.get('bot_token', '')
+ADMIN_IDS = config.get('admin_ids', [])
+
+# 反馈配置
+FEEDBACK_TYPES = {
+    'bug': '问题反馈',
+    'feature': '功能建议',
+    'question': '疑问咨询',
+    'suggestion': '一般建议',
+    'general': '一般反馈'
+}
+
+# 优先级配置
+PRIORITY_LEVELS = {
+    '!': '普通',
+    '!!': '高',
+    '!!!': '紧急'
+}
+
+# 反馈类型图标
+FEEDBACK_ICONS = {
+    'bug': '🐛',
+    'feature': '💡',
+    'question': '❓',
+    'suggestion': '📝',
+    'general': '📢'
+}
+
+# 优先级图标
+PRIORITY_ICONS = {
+    '!': '⚪',
+    '!!': '🟡',
+    '!!!': '🔴'
+}
+
+# 群组配置
+ADMIN_GROUP_ID = config['admin_group_id']
 FEEDBACK_GROUPS = config['feedback_groups']
-
-# 反馈展示群组ID
 DISPLAY_GROUP = config['display_group']
-
-# 反馈标签
-FEEDBACK_TAG = config['feedback_tag']
-
-# 数据库文件
-DB_FILE = config['db_file']
-
-# 管理员ID列表
-ADMIN_IDS = config['admin_ids']
-
-# MoviePoilt API 配置
-MOVIEPOILT_API_URL = config.get('moviepoilt_api_url', 'http://46.38.242.30:3000')
-MOVIEPOILT_LOGIN_URL = f"{MOVIEPOILT_API_URL}/auth/login"
-MOVIEPOILT_SEARCH_URL = f"{MOVIEPOILT_API_URL}/search"
-MOVIEPOILT_USERNAME = config.get('moviepoilt_username', 'admin')
-MOVIEPOILT_PASSWORD = config.get('moviepoilt_password', 'wonderful123') 
+FEEDBACK_TAG = config['feedback_tag'] 
