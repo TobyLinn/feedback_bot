@@ -230,9 +230,14 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     # 在原始群组发送通知
                     try:
                         logger.info(f"尝试发送消息到群组: {group_id}")
+                        # 获取用户信息
+                        user = await context.bot.get_chat_member(group_id, user_id)
+                        username = user.user.username or user.user.first_name
+                        # 发送带 @ 的通知
                         await context.bot.send_message(
                             chat_id=group_id,
-                            text=notification
+                            text=f"@{username} {notification}",
+                            parse_mode='HTML'
                         )
                         logger.info("成功发送反馈处理通知")
                     except Exception as e:
@@ -284,9 +289,14 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     # 在原始群组发送通知
                     try:
                         logger.info(f"尝试发送消息到群组: {group_id}")
+                        # 获取用户信息
+                        user = await context.bot.get_chat_member(group_id, user_id)
+                        username = user.user.username or user.user.first_name
+                        # 发送带 @ 的通知
                         await context.bot.send_message(
                             chat_id=group_id,
-                            text=notification
+                            text=f"@{username} {notification}",
+                            parse_mode='HTML'
                         )
                         logger.info("成功发送反馈处理通知")
                     except Exception as e:
