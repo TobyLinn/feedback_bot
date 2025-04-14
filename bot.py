@@ -66,13 +66,17 @@ async def handle_feedback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = update.effective_message
         chat_id = update.effective_chat.id
         
-        # 检查是否在正确的群组中
-        if not is_admin_group(chat_id) and not is_user_group(chat_id):
-            await message.reply_text("抱歉，此功能只能在指定的群组中使用。")
+        # 检查是否在用户群组中
+        if not is_user_group(chat_id):
+            return
+
+        # 检查消息是否以 #反馈 开头
+        content = message.text
+        if not content or not content.startswith('#反馈'):
             return
 
         # 解析反馈内容
-        content = message.text
+        content = content[3:].strip()  # 移除 #反馈 前缀
         if not content:
             await message.reply_text("请提供反馈内容。")
             return
